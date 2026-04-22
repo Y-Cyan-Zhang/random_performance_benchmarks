@@ -14,3 +14,18 @@ Random Access: vector=12.3571ms, deque=4.73229ms
 Not reserved vector, 10 million push_backs: 149.884ms
 Reserved vector, 10 million push_backs: 89.2705ms
 ```
+#### push_back_vs_indexing.cpp
+```
+=== -O0 ===
+Direct indexing: 58.3215 ms
+Push back: 115.194 ms
+=== -O1 ===
+Direct indexing: 2.29609 ms
+Push back: 4.3364 ms
+=== -O2 ===
+Direct indexing: 2.00498 ms
+Push back: 4.33898 ms
+=== -O3 ===
+Direct indexing: 2.01649 ms
+Push back: 4.39216 ms
+```
