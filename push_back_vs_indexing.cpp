@@ -6,6 +6,12 @@
  *       In theory, direct indexing should be faster since push_back has the overhead
  *       of checking capacity, incrementing the size, and then writing.
  *       Direct indexing woould just be a direct memory access followed by a write.
+ * NOTE: (After running), direct indexing is consistently faster, but I was wrong
+ *       about direct indexing being a direct memory access. Since it's on the
+ *       std::vector container, it actually calls the operator[] function, which
+ *       has it's own overhead. However, for optimization levels above -O0, this 
+ *       is not true, as it gets inlined to direct memory access.
+ *        e.g. vec[i] = 7 -> *(vec + i) = 7
  * */
 #include <vector>
 #include <iostream>
