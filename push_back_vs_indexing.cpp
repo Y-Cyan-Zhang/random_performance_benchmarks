@@ -14,9 +14,9 @@
 template<typename F>
 double measure(F func) {
   auto start = std::chrono::high_resolution_clock::now();
-  func();
+  auto result = func(); // store result so the compiler doesn't optimize away the dead code
   auto end = std::chrono::high_resolution_clock::now();
-
+  volatile auto sink = result;  // Prevent optimization
   return std::chrono::duration<double, std::milli>(end - start).count();
 }
 
@@ -27,6 +27,7 @@ int main() {
     std::vector<int> v(N);
     for (int i = 0; i < N; i++)
       v[i] = 7;
+    return v[N/2];  // Force compiler to keep the work
   });
 
   double pushing_back = measure([](){
@@ -34,6 +35,7 @@ int main() {
     v.reserve(N);
     for (int i = 0; i < N; i++)
       v.push_back(7);
+    return v[N/2];  // Force compiler to keep the work
   });
 
   std::cout << "Testing direct indexing vs push_back for 10,000,000 vector writes, both initialized as to not have to resize the vector\n";
