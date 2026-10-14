@@ -23,7 +23,7 @@ static void clobber() {
   asm volatile("" ::: "memory");
 }
 
-unsigned long long benchmark(std::function<unsigned long long(std::vector<int>&)> func,
+std::pair<ull, volatile ull> benchmark(std::function<unsigned long long(std::vector<int>&)> func,
                              std::vector<int>& v) {
 
   volatile unsigned long long sink = 0;
@@ -33,14 +33,14 @@ unsigned long long benchmark(std::function<unsigned long long(std::vector<int>&)
     auto start = high_resolution_clock::now();
     
     clobber();
-    func(v);
+    sink += func(v);
     clobber();
 
     auto end = high_resolution_clock::now();
     run_time += duration_cast<milliseconds>(end - start).count();
   }
 
-  return run_time;
+  return {run_time, sink};
 }
 
 unsigned long long no_mispredicts(std::vector<int>& data) {
@@ -89,9 +89,9 @@ int main() {
     x = dist(gen);
   }
 
-  ull t1 = benchmark(no_mispredicts, data); 
-  ull t2 = benchmark(some_mispredicts, data); 
-  ull t3 = benchmark(lot_mispredicts, data); 
+  auto [t1, res1] = benchmark(no_mispredicts, data); 
+  auto [t2, res2] = benchmark(some_mispredicts, data); 
+  auto [t3, res3] = benchmark(lot_mispredicts, data); 
 
 
   std::cout << "No branch mispredictions: " << t1 / RUNS << std::endl;
