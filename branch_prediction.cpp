@@ -31,7 +31,9 @@ unsigned long long benchmark(std::function<unsigned long long(std::vector<int>&)
   for (int i = 0; i < RUNS; i++) {
     auto start = high_resolution_clock::now();
     
+    clobber();
     func(v);
+    clobber();
 
     auto end = high_resolution_clock::now();
     run_time += duration_cast<milliseconds>(end - start).count();
