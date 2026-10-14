@@ -23,11 +23,16 @@ static void clobber() {
   asm volatile("" ::: "memory");
 }
 
-std::pair<ull, volatile ull> benchmark(std::function<unsigned long long(std::vector<int>&)> func,
+std::pair<double, volatile ull> benchmark(std::function<unsigned long long(std::vector<int>&)> func,
                              std::vector<int>& v) {
 
   volatile unsigned long long sink = 0;
-  unsigned long long run_time = 0;
+  double run_time = 0.0;
+
+  // untimed warm-up so caches and the branch predictor are warm
+  clobber();
+  sink += func(v);
+  clobber();
 
   for (int i = 0; i < RUNS; i++) {
     auto start = high_resolution_clock::now();
@@ -37,7 +42,7 @@ std::pair<ull, volatile ull> benchmark(std::function<unsigned long long(std::vec
     clobber();
 
     auto end = high_resolution_clock::now();
-    run_time += duration_cast<milliseconds>(end - start).count();
+    run_time += duration<double, std::milli>(end - start).count();
   }
 
   return {run_time, sink};
@@ -46,7 +51,7 @@ std::pair<ull, volatile ull> benchmark(std::function<unsigned long long(std::vec
 unsigned long long no_mispredicts(std::vector<int>& data) {
   unsigned long long result = 0;
   for (int i = 0; i < ARRAY_SIZE; i++) {
-    if (i % 2) {
+    if (data[i] >= 0) {
       result += 1;
     }
   }
