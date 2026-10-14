@@ -4,6 +4,7 @@
 #include <iostream>
 #include <chrono>
 #include <functional>
+#include <vector>
 #include <random>
 
 using namespace std::chrono;
@@ -25,7 +26,7 @@ static void clobber() {
 unsigned long long benchmark(std::function<unsigned long long(std::vector<int>&)> func,
                              std::vector<int>& v) {
 
-  unsigned long long result = 0;
+  volatile unsigned long long sink = 0;
   unsigned long long run_time = 0;
 
   for (int i = 0; i < RUNS; i++) {
@@ -63,7 +64,7 @@ unsigned long long lot_mispredicts(std::vector<int>& data) {
   return result;
 }
 
-// function with ~98% mispredicts
+// function with ~2% mispredicts
 unsigned long long some_mispredicts(std::vector<int>& data) {
   unsigned long long result = 0;
   for (int i = 0; i < ARRAY_SIZE; i++) {
