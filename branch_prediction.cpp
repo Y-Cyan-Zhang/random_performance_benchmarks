@@ -8,7 +8,8 @@
     clang++ -std=c++17 -O3 branch_prediction.cpp && ./a.out
  *
  * Note: according to DS4.1-flash, -O2 and above auto vectorizes
- * which just skips the if condition.
+ * which just skips the if condition. Supposedly, memory bandwith
+ * also dominates, rather than pure misprediction.
  */
 #include <iostream>
 #include <chrono>
