@@ -1,5 +1,14 @@
 /* Using to test simple branch prediction performance differences.
  * Mainly for pedagolical reasons.
+ *
+ * Compile instructions (copy and paste):
+ * clang++ -std=c++17 -O0 branch_prediction.cpp && ./a.out
+ * clang++ -std=c++17 -O1 branch_prediction.cpp && ./a.out
+ * clang++ -std=c++17 -O2 branch_prediction.cpp && ./a.out
+ * clang++ -std=c++17 -O3 branch_prediction.cpp && ./a.out
+ *
+ * Note: according to DS4.1-flash, -O2 and above auto vectorizes
+ * which just skips the if condition.
  */
 #include <iostream>
 #include <chrono>
