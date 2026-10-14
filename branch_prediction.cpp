@@ -15,7 +15,7 @@ using ull = unsigned long long;
  * likely optimize away code that involves 
  * constexpr and preprocessor macros
  */
-constexpr int ARRAY_SIZE = 1000000000; // 1 billion
+constexpr int ARRAY_SIZE = 100000000; // 100 million
 constexpr int RUNS = 5;
 
 static void clobber() {
