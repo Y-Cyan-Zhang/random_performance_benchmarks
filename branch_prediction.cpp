@@ -87,11 +87,11 @@ int main() {
   }
 
   ull t1 = benchmark(no_mispredicts, data); 
-  ull t2 = benchmark(lot_mispredicts, data); 
-  ull t3 = benchmark(some_mispredicts, data); 
+  ull t2 = benchmark(some_mispredicts, data); 
+  ull t3 = benchmark(lot_mispredicts, data); 
 
 
-  std::cout << t1 / RUNS << std::endl;
-  std::cout << t2 / RUNS << std::endl;
-  std::cout << t3 / RUNS << std::endl;
+  std::cout << "No branch mispredictions: " << t1 / RUNS << std::endl;
+  std::cout << "Some branch mispredictions: " << t2 / RUNS << std::endl;
+  std::cout << "A ton of branch mispredictions: " << t3 / RUNS << std::endl;
 }
