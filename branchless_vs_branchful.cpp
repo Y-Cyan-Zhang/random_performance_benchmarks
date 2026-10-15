@@ -2,11 +2,14 @@
  * Mainly for pedagogical reasons.
  *
  * Both loops compute the same thing: the sum of every element >= 128.
- * Each is run on random data (branch is a coin flip -> ~50% mispredicts)
+ * Each is run on random data (branch is a coin flip -> ~50% mispredicts),
+ * on skewed data (random order, but only ~10% of elements pass the if, so
+ * the predictor guesses "not taken" and is wrong ~10% of the time),
  * and on sorted data (branch is perfectly predictable).
  *
  * Expected result: the branchful loop is fast on sorted data and slow on
- * random data, while the branchless loop takes about the same time on both.
+ * random data, with skewed data somewhere in between, while the branchless
+ * loop takes about the same time on all three.
  *
  * Compile instructions (copy and paste):
     clang++ -std=c++17 -O0 branchless_vs_branchful.cpp && ./a.out
@@ -98,21 +101,37 @@ int main() {
     x = dist(gen);
   }
 
+  // skewed values in random order: ~10% in [128, 255], ~90% in [0, 127]
+  std::bernoulli_distribution passes(0.10);
+  std::uniform_int_distribution<int> low(0, THRESHOLD - 1);
+  std::uniform_int_distribution<int> high(THRESHOLD, 255);
+
+  std::vector<int> skewed_data(ARRAY_SIZE);
+  for (auto& x : skewed_data) {
+    x = passes(gen) ? high(gen) : low(gen);
+  }
+
   std::vector<int> sorted_data = random_data;
   std::sort(sorted_data.begin(), sorted_data.end());
 
   auto [t1, s1] = benchmark(branchful, random_data);
-  auto [t2, s2] = benchmark(branchful, sorted_data);
-  auto [t3, s3] = benchmark(branchless, random_data);
-  auto [t4, s4] = benchmark(branchless, sorted_data);
+  auto [t2, s2] = benchmark(branchful, skewed_data);
+  auto [t3, s3] = benchmark(branchful, sorted_data);
+  auto [t4, s4] = benchmark(branchless, random_data);
+  auto [t5, s5] = benchmark(branchless, skewed_data);
+  auto [t6, s6] = benchmark(branchless, sorted_data);
 
   std::cout << "Branchful,  random data: " << t1 << " ms\n";
-  std::cout << "Branchful,  sorted data: " << t2 << " ms\n";
-  std::cout << "Branchless, random data: " << t3 << " ms\n";
-  std::cout << "Branchless, sorted data: " << t4 << " ms\n";
+  std::cout << "Branchful,  skewed data: " << t2 << " ms\n";
+  std::cout << "Branchful,  sorted data: " << t3 << " ms\n";
+  std::cout << "======================================" << "\n";
+  std::cout << "Branchless, random data: " << t4 << " ms\n";
+  std::cout << "Branchless, skewed data: " << t5 << " ms\n";
+  std::cout << "Branchless, sorted data: " << t6 << " ms\n";
 
-  // all four sinks should be identical multiples of the true sum
-  if (!(s1 == s2 && s2 == s3 && s3 == s4)) {
+  // sorted data is a permutation of random data, so those sinks all match;
+  // skewed data has a different sum, so only compare its two runs
+  if (!(s1 == s3 && s3 == s4 && s4 == s6 && s2 == s5)) {
     std::cerr << "Mismatched results!\n";
     return 1;
   }
